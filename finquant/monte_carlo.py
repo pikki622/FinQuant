@@ -31,7 +31,7 @@ class MonteCarlo(object):
          :result: List of quantities returned from `fun` at each iteration.
         """
         result = []
-        for i in range(self.num_trials):
+        for _ in range(self.num_trials):
             res = fun(**kwargs)
             result.append(res)
         return np.asarray(result)
@@ -240,9 +240,9 @@ class MonteCarloOpt(MonteCarlo):
             "Monte Carlo simulation to optimise the portfolio based "
             + "on the Efficient Frontier"
         )
-        plt.xlabel("Volatility [period=" + str(self.freq) + "]")
-        plt.ylabel("Expected Return [period=" + str(self.freq) + "]")
-        cbar.ax.set_ylabel("Sharpe Ratio [period=" + str(self.freq) + "]", rotation=90)
+        plt.xlabel(f"Volatility [period={str(self.freq)}]")
+        plt.ylabel(f"Expected Return [period={str(self.freq)}]")
+        cbar.ax.set_ylabel(f"Sharpe Ratio [period={str(self.freq)}]", rotation=90)
         plt.legend()
 
     def properties(self):
@@ -252,10 +252,8 @@ class MonteCarloOpt(MonteCarlo):
         string = ""
         for val in opt_vals:
             string += "-" * 70
-            string += "\nOptimised portfolio for {}".format(
-                val.replace("Min", "Minimum").replace("Max", "Maximum")
-            )
-            string += "\n\nTime period: {} days".format(self.freq)
+            string += f'\nOptimised portfolio for {val.replace("Min", "Minimum").replace("Max", "Maximum")}'
+            string += f"\n\nTime period: {self.freq} days"
             string += "\nExpected return: {0:0.3f}".format(
                 self.opt_results.loc[val]["Expected Return"]
             )

@@ -82,8 +82,8 @@ pf.properties()
 # <codecell>
 
 # if needed, change risk free rate and frequency/time window of the portfolio
-print("pf.risk_free_rate = {}".format(pf.risk_free_rate))
-print("pf.freq = {}".format(pf.freq))
+print(f"pf.risk_free_rate = {pf.risk_free_rate}")
+print(f"pf.freq = {pf.freq}")
 
 # <codecell>
 

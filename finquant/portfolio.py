@@ -146,7 +146,7 @@ class Stock(object):
         """
         # nicely printing out information and quantities of the stock
         string = "-" * 50
-        string += "\nStock: {}".format(self.name)
+        string += f"\nStock: {self.name}"
         string += "\nExpected Return:{:0.3f}".format(self.expected_return.values[0])
         string += "\nVolatility: {:0.3f}".format(self.volatility.values[0])
         string += "\nSkewness: {:0.5f}".format(self.skew)
@@ -158,9 +158,7 @@ class Stock(object):
         print(string)
 
     def __str__(self):
-        # print short description
-        string = "Contains information about " + str(self.name) + "."
-        return string
+        return f"Contains information about {str(self.name)}."
 
 
 class Portfolio(object):
@@ -230,10 +228,9 @@ class Portfolio(object):
     def risk_free_rate(self, val):
         if not isinstance(val, (float, int)):
             raise ValueError("Risk free rate must be a float or an integer.")
-        else:
-            self.__risk_free_rate = val
-            # now that this changed, update other quantities
-            self._update()
+        self.__risk_free_rate = val
+        # now that this changed, update other quantities
+        self._update()
 
     def add_stock(self, stock):
         """Adds a stock of type ``Stock`` to the portfolio. Each time ``add_stock``
@@ -566,9 +563,7 @@ class Portfolio(object):
         # let EfficientFrontier.efficient_frontier handle input arguments
         # get/create instance of EfficientFrontier
         ef = self._get_ef()
-        # perform optimisation
-        efrontier = ef.efficient_frontier(targets)
-        return efrontier
+        return ef.efficient_frontier(targets)
 
     def ef_plot_efrontier(self):
         """Interface to
@@ -697,9 +692,9 @@ class Portfolio(object):
         # nicely printing out information and quantities of the portfolio
         string = "-" * 70
         stocknames = self.portfolio.Name.values.tolist()
-        string += "\nStocks: {}".format(", ".join(stocknames))
-        string += "\nTime window/frequency: {}".format(self.freq)
-        string += "\nRisk free rate: {}".format(self.risk_free_rate)
+        string += f'\nStocks: {", ".join(stocknames)}'
+        string += f"\nTime window/frequency: {self.freq}"
+        string += f"\nRisk free rate: {self.risk_free_rate}"
         string += "\nPortfolio Expected Return: {:0.3f}".format(self.expected_return)
         string += "\nPortfolio Volatility: {:0.3f}".format(self.volatility)
         string += "\nPortfolio Sharpe Ratio: {:0.3f}".format(self.sharpe)
@@ -714,9 +709,7 @@ class Portfolio(object):
         print(string)
 
     def __str__(self):
-        # print short description
-        string = "Contains information about a portfolio."
-        return string
+        return "Contains information about a portfolio."
 
 
 def _correct_quandl_request_stock_name(names):
@@ -852,19 +845,15 @@ def _get_stocks_data_columns(data, names, cols):
             # 1. if <stock_name> in column labels
             if names[i] in data.columns:
                 colname = names[i]
-            # 2. if "WIKI/<stock_name> - <col>" in column labels
             elif _get_quandl_data_column_label(reqnames[i], col) in data.columns:
                 colname = _get_quandl_data_column_label(reqnames[i], col)
-            # 3. if "<stock_name> - <col>" in column labels
             elif _get_quandl_data_column_label(names[i], col) in data.columns:
                 colname = _get_quandl_data_column_label(names[i], col)
-            # if column labels is of type multiindex, and the "Adj Close" is in
-            # first level labels, we assume the dataframe comes from yfinance:
             elif isinstance(data.columns, pd.MultiIndex):
                 # alter col for yfinance, as it returns column labels without '.'
                 col = col.replace(".", "")
                 if col in data.columns:
-                    if not col in firstlevel_colnames:
+                    if col not in firstlevel_colnames:
                         firstlevel_colnames.append(col)
                     if names[i] in data[col].columns:
                         colname = names[i]
@@ -872,7 +861,6 @@ def _get_stocks_data_columns(data, names, cols):
                         raise ValueError(
                             "Could not find column labels in second level of MultiIndex pd.DataFrame"
                         )
-            # else, error
             else:
                 raise ValueError("Could not find column labels in given dataframe.")
             # append correct name to list of correct names
@@ -880,7 +868,7 @@ def _get_stocks_data_columns(data, names, cols):
 
     # if data comes from yfinance, it is a multiindex dataframe:
     if isinstance(data.columns, pd.MultiIndex):
-        if not len(firstlevel_colnames) == 1:
+        if len(firstlevel_colnames) != 1:
             raise ValueError(
                 "Sorry, for now only one value/quantity per Stock is supported."
             )
@@ -894,9 +882,7 @@ def _get_stocks_data_columns(data, names, cols):
     newcolnames = {}
     if len(cols) == 1:
         for i in range(len(names)):
-            newcolnames.update(
-                {_get_quandl_data_column_label(names[i], cols[0]): names[i]}
-            )
+            newcolnames[_get_quandl_data_column_label(names[i], cols[0])] = names[i]
         data.rename(columns=newcolnames, inplace=True)
     return data
 
@@ -978,7 +964,7 @@ def _generate_pf_allocation(names=None, data=None):
         splitnames = [name.split("-")[0].strip() for name in names]
         for i in range(len(splitnames)):
             splitname = splitnames[i]
-            reducedlist = [elt for num, elt in enumerate(splitnames) if not num == i]
+            reducedlist = [elt for num, elt in enumerate(splitnames) if num != i]
             if splitname in reducedlist:
                 errormsg = (
                     "'data' pandas.DataFrame contains conflicting "
@@ -1004,7 +990,7 @@ def _generate_pf_allocation(names=None, data=None):
                 raise ValueError(errormsg)
     # if names is given, we go directly to the below:
     # compute equal weights
-    weights = [1.0 / len(names) for i in range(len(names))]
+    weights = [1.0 / len(names) for _ in range(len(names))]
     return pd.DataFrame({"Allocation": weights, "Name": names})
 
 
@@ -1136,7 +1122,7 @@ def build_portfolio(**kwargs):
     ]
 
     # check if no input argument was passed
-    if kwargs == {}:
+    if not kwargs:
         raise ValueError(
             "Error:\nbuild_portfolio() requires input " + "arguments.\n" + docstring_msg
         )

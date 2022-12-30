@@ -95,7 +95,7 @@ class EfficientFrontier(object):
 
         # set numerical parameters
         bound = (0, 1)
-        self.bounds = tuple(bound for stock in range(self.num_stocks))
+        self.bounds = tuple(bound for _ in range(self.num_stocks))
         self.x0 = np.array(self.num_stocks * [1.0 / self.num_stocks])
         self.constraints = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
 
@@ -137,15 +137,13 @@ class EfficientFrontier(object):
         )
         # if successful, set self.last_optimisation
         self.last_optimisation = "Minimum Volatility"
-        # set optimal weights
-        if save_weights:
-            self.weights = result["x"]
-            self.df_weights = self._dataframe_weights(self.weights)
-            return self.df_weights
-        else:
+        if not save_weights:
             # not setting instance variables, and returning array instead
             # of pandas.DataFrame
             return result["x"]
+        self.weights = result["x"]
+        self.df_weights = self._dataframe_weights(self.weights)
+        return self.df_weights
 
     def maximum_sharpe_ratio(self, save_weights=True):
         """Finds the portfolio with the maximum Sharpe Ratio, also called the
@@ -181,15 +179,13 @@ class EfficientFrontier(object):
         )
         # if successful, set self.last_optimisation
         self.last_optimisation = "Maximum Sharpe Ratio"
-        # set optimal weights
-        if save_weights:
-            self.weights = result["x"]
-            self.df_weights = self._dataframe_weights(self.weights)
-            return self.df_weights
-        else:
+        if not save_weights:
             # not setting instance variables, and returning array instead
             # of pandas.DataFrame
             return result["x"]
+        self.weights = result["x"]
+        self.df_weights = self._dataframe_weights(self.weights)
+        return self.df_weights
 
     def efficient_return(self, target, save_weights=True):
         """Finds the portfolio with the minimum volatility for a given target
@@ -239,15 +235,13 @@ class EfficientFrontier(object):
         )
         # if successful, set self.last_optimisation
         self.last_optimisation = "Efficient Return"
-        # set optimal weights
-        if save_weights:
-            self.weights = result["x"]
-            self.df_weights = self._dataframe_weights(self.weights)
-            return self.df_weights
-        else:
+        if not save_weights:
             # not setting instance variables, and returning array instead
             # of pandas.DataFrame
             return result["x"]
+        self.weights = result["x"]
+        self.df_weights = self._dataframe_weights(self.weights)
+        return self.df_weights
 
     def efficient_volatility(self, target):
         """Finds the portfolio with the maximum Sharpe ratio for a given
@@ -359,13 +353,16 @@ class EfficientFrontier(object):
             annualised_portfolio_quantities(
                 min_vol_weights, self.mean_returns, self.cov_matrix, freq=self.freq
             )
-        )[0:2]
+        )[:2]
         min_vol_vals.reverse()
         max_sharpe_vals = list(
             annualised_portfolio_quantities(
-                max_sharpe_weights, self.mean_returns, self.cov_matrix, freq=self.freq
+                max_sharpe_weights,
+                self.mean_returns,
+                self.cov_matrix,
+                freq=self.freq,
             )
-        )[0:2]
+        )[:2]
         max_sharpe_vals.reverse()
         plt.scatter(
             min_vol_vals[0],
@@ -419,9 +416,9 @@ class EfficientFrontier(object):
         )
         if verbose:
             string = "-" * 70
-            string += "\nOptimised portfolio for {}".format(self.last_optimisation)
-            string += "\n\nTime window/frequency: {}".format(self.freq)
-            string += "\nRisk free rate: {}".format(self.risk_free_rate)
+            string += f"\nOptimised portfolio for {self.last_optimisation}"
+            string += f"\n\nTime window/frequency: {self.freq}"
+            string += f"\nRisk free rate: {self.risk_free_rate}"
             string += "\nExpected annual Return: {:.3f}".format(expected_return)
             string += "\nAnnual Volatility: {:.3f}".format(volatility)
             string += "\nSharpe Ratio: {:.3f}".format(sharpe)

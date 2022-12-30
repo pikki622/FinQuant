@@ -35,7 +35,7 @@ def compute_ma(data, fun, spans, plot=True):
     # compute moving averages
     ma = data.copy(deep=True)
     for span in spans:
-        ma[str(span) + "d"] = fun(data, span=span)
+        ma[f"{str(span)}d"] = fun(data, span=span)
     if plot:
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -43,9 +43,9 @@ def compute_ma(data, fun, spans, plot=True):
         ma.plot(ax=ax)
         # Create buy/sell signals of shortest and longest span
         minspan = min(spans)
-        minlabel = str(minspan) + "d"
+        minlabel = f"{str(minspan)}d"
         maxspan = max(spans)
-        maxlabel = str(maxspan) + "d"
+        maxlabel = f"{str(maxspan)}d"
         signals = ma.copy(deep=True)
         signals["diff"] = 0.0
         signals["diff"][minspan:] = np.where(
@@ -72,7 +72,7 @@ def compute_ma(data, fun, spans, plot=True):
             label="sell signal",
         )
         # title
-        title = "Band of Moving Averages (" + str(fun.__name__) + ")"
+        title = f"Band of Moving Averages ({str(fun.__name__)})"
         plt.title(title)
         # legend
         plt.legend(ncol=2)
@@ -158,7 +158,7 @@ def plot_bollinger_band(data, fun, span):
     """
     if not isinstance(data, pd.DataFrame):
         raise ValueError("data is expected to be a pandas.DataFrame")
-    if not len(data.columns.values) == 1:
+    if len(data.columns.values) != 1:
         raise ValueError("data is expected to have only one column.")
     if not isinstance(span, int):
         raise ValueError("span must be an integer.")
@@ -172,12 +172,12 @@ def plot_bollinger_band(data, fun, span):
     collabel = data.columns.values[0]
     # get standard deviation
     if fun == sma:
-        std[str(span) + "d std"] = sma_std(data[collabel], span=span)
+        std[f"{str(span)}d std"] = sma_std(data[collabel], span=span)
     elif fun == ema:
-        std[str(span) + "d std"] = ema_std(data[collabel], span=span)
+        std[f"{str(span)}d std"] = ema_std(data[collabel], span=span)
     # compute upper and lower band
-    bol["Lower Band"] = bol[str(span) + "d"] - (std[str(span) + "d std"] * 2)
-    bol["Upper Band"] = bol[str(span) + "d"] + (std[str(span) + "d std"] * 2)
+    bol["Lower Band"] = bol[f"{str(span)}d"] - std[f"{str(span)}d std"] * 2
+    bol["Upper Band"] = bol[f"{str(span)}d"] + std[f"{str(span)}d std"] * 2
     # plot
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -191,7 +191,7 @@ def plot_bollinger_band(data, fun, span):
     )
     # plot data and moving average
     bol[collabel].plot(ax=ax)
-    bol[str(span) + "d"].plot(ax=ax)
+    bol[f"{str(span)}d"].plot(ax=ax)
     # title
     title = (
         "Bollinger Band of +/- 2$\\sigma$, Moving Average of "

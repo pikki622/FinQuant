@@ -239,7 +239,7 @@ exret = pf.comp_expected_return(freq=100)
 vol = pf.comp_volatility(freq=100)
 sharpe = pf.comp_sharpe()
 print(
-    "For {} trading days and a risk free rate of {}:".format(pf.freq, pf.risk_free_rate)
+    f"For {pf.freq} trading days and a risk free rate of {pf.risk_free_rate}:"
 )
 print("Expected return: {:0.3f}".format(exret))
 print("Volatility: {:0.3f}".format(vol))

@@ -35,7 +35,7 @@ weights_df_pf = [
     0.23809523809523808,
     0.2857142857142857,
 ]
-weights_no_df_pf = [1.0 / len(names) for i in range(len(names))]
+weights_no_df_pf = [1.0 / len(names) for _ in range(len(names))]
 df_pf2 = pd.DataFrame({"Allocation": weights_no_df_pf, "Name": names})
 df_pf2_yf = pd.DataFrame({"Allocation": weights_no_df_pf, "Name": names_yf})
 start_date = datetime.datetime(2015, 1, 1)
